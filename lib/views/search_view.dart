@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:weather_app/cubits/get_weather_cubit/get_weather_cubit.dart';
 
 class SearchView extends StatefulWidget {
   const SearchView({super.key});
@@ -8,83 +10,63 @@ class SearchView extends StatefulWidget {
   State<SearchView> createState() => _SearchViewState();
 }
 
+// ... (الإستيرادات كما هي)
+
 class _SearchViewState extends State<SearchView> {
   TextEditingController controller = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
+    // بنجيب اللون الحالي من الثيم اللي حددناه في الـ main
+    final themeColor = Theme.of(context).primaryColor;
+
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0xff4EABF4),
+        // بدل اللون الثابت، بنستخدم لون الثيم
+        backgroundColor: themeColor, 
         foregroundColor: Colors.white,
-        title: Text(
+        title: const Text(
           'Search for a country',
           style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
         ),
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextField(
-              controller:
-                  controller, //! ربطنا اللى هيكتبه اليوزر بالمتغير اللى عملناه فوق
-
+              controller: controller,
               decoration: InputDecoration(
                 labelText: 'Enter city name',
                 hintText: 'eg. Cairo',
-                prefixIcon: Icon(Icons.search),
-                suffixIcon: Icon(Icons.location_city),
-                suffixIconColor: Color(0xff4EABF4),
-                labelStyle: TextStyle(fontSize: 20),
-                border: OutlineInputBorder(),
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: const Icon(Icons.location_city),
+                // استخدام لون الثيم هنا برضه
+                suffixIconColor: themeColor,
+                labelStyle: const TextStyle(fontSize: 20),
+                border: const OutlineInputBorder(),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: themeColor), // لون الحدود عند الضغط
+                ),
                 filled: true,
                 fillColor: Colors.white70,
-                errorText: controller.text.isEmpty
-                    ? 'City name cannot be empty'
-                    : null,
               ),
-
-              style: TextStyle(
-                fontSize: 20,
-                // fontWeight: FontWeight.bold,
-                color: Colors.yellow[900],
-              ),
-
-              keyboardType: TextInputType.text,
-              inputFormatters: [
-                // ده الفلتر اللي بيسمح بالحروف العربية والإنجليزية والمسافات فقط
-                FilteringTextInputFormatter.allow(
-                  RegExp(r'[a-zA-Z\s\u0600-\u06FF]'),
-                ),
-              ],
-
-              textInputAction: TextInputAction.search,
-
-              cursorColor: Color(0xff4EABF4), // لون المؤشر
-              cursorWidth: 3.0, // يمكنك أيضاً التحكم في سمك المؤشر
-              cursorRadius: Radius.circular(5,), // جعل حواف المؤشر دائرية بدلاً من حادة
-            
-              maxLength: 10, // الحد الأقصى لعدد الأحرف 
-              // maxLengthEnforcement: MaxLengthEnforcement.enforced, // فرض الحد الأقصى لعدد الأحرف default behavior
-              // buildCounter: (context, {required currentLength, required isFocused, required maxLength}) => null, // لإخفاء عداد الأحرف,
+              // ... باقي خصائص الـ TextField
+              cursorColor: themeColor, // لون المؤشر يتبع الثيم
             ),
-
-            
-
-            SizedBox(height: 20),
-
+            const SizedBox(height: 20),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xff4EABF4),
-                padding: EdgeInsets.all(25),
+                backgroundColor: themeColor, // لون الزرار يتبع الثيم
+                padding: const EdgeInsets.all(25),
               ),
               onPressed: () {
-                Navigator.pop(context, controller.text);
+                var getWeatherCubit = BlocProvider.of<GetWeatherCubit>(context);
+                getWeatherCubit.getWeather(cityName: controller.text);
+                Navigator.pop(context);
               },
-              child: Text(
+              child: const Text(
                 "Search",
                 style: TextStyle(
                   fontSize: 25,

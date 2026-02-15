@@ -4,7 +4,7 @@ import 'package:weather_app/models/weather_model.dart';
 class WeatherApi {
   final Dio dio;
 
-  WeatherApi({required this.dio});
+  WeatherApi(this.dio);
 
   Future<WeatherModel> getWeather({required String cityName}) async {
     var response = await dio.get(
